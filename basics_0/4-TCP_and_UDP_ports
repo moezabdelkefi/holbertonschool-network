@@ -1,22 +1,20 @@
 #!/usr/bin/env bash
 
 # Get the listening sockets information
-listening_sockets=$(netstat -tuln | grep 'LISTEN')
+listening_sockets=$(sudo netstat -tunlp | awk 'NR>2 {print}')
+
+# Print the header
+echo "Active Internet connections (only servers)"
+echo "Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name"
 
 # Iterate through each line of the listening sockets
 while IFS= read -r line; do
-    # Extract the port number and protocol from the line
-    port=$(echo "$line" | awk '{print $4}' | awk -F ':' '{print $NF}')
+    # Extract the protocol, local address, and PID/Program name from the line
     protocol=$(echo "$line" | awk '{print $1}')
-
-    # Get the PID and program name associated with the listening socket
-    pid=$(lsof -i ":$port" -sTCP:LISTEN -sUDP:LISTEN -t)
-    program=$(lsof -i ":$port" -sTCP:LISTEN -sUDP:LISTEN -c)
+    local_address=$(echo "$line" | awk '{print $4}')
+    pid_program=$(echo "$line" | awk '{print $7}')
 
     # Print the information
-    echo "Port: $port"
-    echo "Protocol: $protocol"
-    echo "PID: $pid"
-    echo "Program: $program"
-    echo "---------------------------------------"
+    echo "$protocol        $local_address      $pid_program"
 done <<< "$listening_sockets"
+
