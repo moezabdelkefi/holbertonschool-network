@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Get the listening sockets information
+listening_sockets=$(netstat -tuln | grep 'LISTEN')
+
+# Iterate through each line of the listening sockets
+while IFS= read -r line; do
+    # Extract the port number and protocol from the line
+    port=$(echo "$line" | awk '{print $4}' | awk -F ':' '{print $NF}')
+    protocol=$(echo "$line" | awk '{print $1}')
+
+    # Get the PID and program name associated with the listening socket
+    pid=$(lsof -i ":$port" -sTCP:LISTEN -sUDP:LISTEN -t)
+    program=$(lsof -i ":$port" -sTCP:LISTEN -sUDP:LISTEN -c)
+
+    # Print the information
+    echo "Port: $port"
+    echo "Protocol: $protocol"
+    echo "PID: $pid"
+    echo "Program: $program"
+    echo "---------------------------------------"
+done <<< "$listening_sockets"
