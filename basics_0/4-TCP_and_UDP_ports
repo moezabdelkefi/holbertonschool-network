@@ -17,4 +17,3 @@ while IFS= read -r line; do
     # Print the information
     echo "$protocol        $local_address      $pid_program"
 done <<< "$listening_sockets"
-
