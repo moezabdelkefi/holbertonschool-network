@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get the listening sockets information
 listening_sockets=$(netstat -tuln | grep 'LISTEN')
